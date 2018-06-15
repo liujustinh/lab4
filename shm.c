@@ -33,7 +33,6 @@ int shm_open(int id, char **pointer) {
 //you write this
  int eid = 0;
   char * freePage;
-  va = PGROUNDUP(myproc()->sz);
   for (int i = 0; i < 64; i++)
   {
     if (id == shm_table.shm_pages[i].id)
@@ -42,8 +41,7 @@ int shm_open(int id, char **pointer) {
       acquire(&(shm_table.lock));
       shm_table.shm_pages[i].refcnt++;
       release(&(shm_table.lock));
-      *pointer=(char *)va;
-      //*pointer=(char *)PGROUNDUP(myproc()->sz);
+      *pointer=(char *)PGROUNDUP(myproc()->sz);
       myproc()->sz = PGROUNDUP(myproc()->sz);
       eid = 1;
     }
@@ -57,12 +55,10 @@ int shm_open(int id, char **pointer) {
       shm_table.shm_pages[i].refcnt = 1; 
       release(&(shm_table.lock));
       mappages(myproc()->pgdir, (char *)(myproc()->sz), PGSIZE, V2P(shm_table.shm_pages[i].frame), PTE_W|PTE_U);
-      //*pointer=(char *)(myproc()->sz);
       *pointer=(char *)(myproc()->sz);
       break;      
     }
   }     
-
 
 
 return 0; //added to remove compiler warning -- you should decide what to return
